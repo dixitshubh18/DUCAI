@@ -1,19 +1,13 @@
-import ReactPayPal from './checkout';
-import React from 'react'
+import SignLogScreen from "./Screenss/Signup";
 import { Component } from 'react';
-
-
-export default class Paymentst extends Component {
+export default class loadSigUpIn extends Component {
     render() {
          return (
             <div className="App">
            <div className="payment-div">
-                  <ReactPayPal />
+                  <SignLogScreen />
                 </div>            
           </div>
         );
     }
 }
-
-
-

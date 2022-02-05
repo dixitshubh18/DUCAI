@@ -1,52 +1,57 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import ReactPayPal from "C:/Users/Lucifer/Downloads/Archive/Archive/src/components/Checkout/payment";
-const [checkout, setCheckout] = React.useState(false);
-export default class Checkout extends Component {
-    
-    render() {
-        const [checkout, setCheckout] = React.useState(false);
-        return (
+import React from "react";
 
-            <div className="container">
-                <div className="row">
-                    <div className="col-10 mt-2 ml-sm-5 ml-md-auto col-sm-8 text-capitalize text-right">
-                        <form>
-                            <label>Enter your name:
-                                <input type="text" />
-                            </label>
-                            <label>Enter your Address:
-                                <input type="text" />
-                            </label>
-                            <label>Enter your ZIP:
-                                <input type="text" />
-                            </label>
-                        </form>
+export default function ReactPayPal() {
+  const [paid, setPaid] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const paypalRef = React.useRef();
 
-                        <div className="App">
-                        <header className="App-header">
-                          {(checkout === true) 
-                            ? <div className="payment-div">
-                              <ReactPayPal />
-                            </div> 
-                  
-                            :<div>
-                              <h1>React-PayPal</h1>
-                              <button onClick={() => {setCheckout(true)}} className="checkout-button">Checkout</button>
-                            </div>
-                          }
-                        </header>
-                      </div>
+  React.useEffect(() => {
+    window.paypal
+      .Buttons({
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            intent: "CAPTURE",
+            purchase_units: [
+              {
+                description: "Your description",
+                amount: {
+                  currency_code: "USD",
+                  value: 500.0,
+                },
+              },
+            ],
+          });
+        },
+        onApprove: async (data, actions) => {
+          const order = await actions.order.capture();
+          setPaid(true);
+          console.log(order);
+        },onCancel:async (data,actions) =>{
+          return console.log("oops");
+        },
+        onError: (err) => {
+        //   setError(err),
+          console.error(err);
+        },
+      })
+      .render(paypalRef.current);
+  }, []);
 
+  // If the payment has been made
+  if (paid) {
+    return <div>Payment successful.!</div>;
+  }
 
-                    </div>
-                </div>
-            </div>
+  // If any error occurs
+  if (error) {
+    return <div>Error Occurred in processing payment.! Please try again.</div>;
+  }
 
-
-        );
-    }
+  // Default Render
+  return (
+    <div>
+      <h4>Total Amount in Rs. : 500 /-</h4>
+      <div ref={paypalRef} />
+    </div>
+  );
 }
-
-
-
